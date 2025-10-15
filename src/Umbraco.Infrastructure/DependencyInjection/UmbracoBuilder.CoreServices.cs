@@ -13,7 +13,6 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Handlers;
-using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
@@ -44,7 +43,7 @@ using Umbraco.Cms.Infrastructure.Configuration;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.HealthChecks;
+using Umbraco.Cms.Infrastructure.Strings;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Mail;
 using Umbraco.Cms.Infrastructure.Mail.Interfaces;
@@ -255,6 +254,16 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IRichTextRegexValidator, RichTextRegexValidator>();
 
+        return builder;
+    }
+
+    /// <summary>
+    /// Configures Markdig pipelines used by the Markdown converter.
+    /// </summary>
+    public static IUmbracoBuilder ConfigureMarkdownPipelines(this IUmbracoBuilder builder, Action<MarkdownPipelinesOptions> configure)
+    {
+        if (configure is null) throw new ArgumentNullException(nameof(configure));
+        builder.Services.Configure(configure);
         return builder;
     }
 

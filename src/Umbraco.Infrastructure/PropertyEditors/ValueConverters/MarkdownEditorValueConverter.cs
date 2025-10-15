@@ -1,10 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using HeyRed.MarkdownSharp;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Extensions;
 
@@ -15,11 +14,13 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
 {
     private readonly HtmlLocalLinkParser _localLinkParser;
     private readonly HtmlUrlParser _urlParser;
+    private readonly IMarkdownToHtmlConverter _markdownConverter;
 
-    public MarkdownEditorValueConverter(HtmlLocalLinkParser localLinkParser, HtmlUrlParser urlParser)
+    public MarkdownEditorValueConverter(HtmlLocalLinkParser localLinkParser, HtmlUrlParser urlParser, IMarkdownToHtmlConverter markdownConverter)
     {
         _localLinkParser = localLinkParser;
         _urlParser = urlParser;
+        _markdownConverter = markdownConverter;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType)
@@ -49,10 +50,9 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
 
     public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        // convert markup to HTML for frontend rendering.
-        // source should come from ConvertSource and be a string (or null) already
-        var mark = new Markdown();
-        return new HtmlEncodedString(inter == null ? string.Empty : mark.Transform((string)inter));
+        var markdown = inter as string;
+        var html = markdown == null ? string.Empty : _markdownConverter.ToHtml(markdown);
+        return new HtmlEncodedString(html);
     }
 
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Element;

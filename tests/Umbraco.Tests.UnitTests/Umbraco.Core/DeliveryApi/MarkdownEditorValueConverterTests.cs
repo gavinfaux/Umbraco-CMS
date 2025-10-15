@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -25,7 +26,8 @@ public class MarkdownEditorValueConverterTests : PropertyValueConverterTests
     {
         var linkParser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
         var urlParser = new HtmlUrlParser(Mock.Of<IOptionsMonitor<ContentSettings>>(), Mock.Of<ILogger<HtmlUrlParser>>(), Mock.Of<IProfilingLogger>(), Mock.Of<IIOHelper>());
-        var valueConverter = new MarkdownEditorValueConverter(linkParser, urlParser);
+        var markdownConverter = Mock.Of<IMarkdownToHtmlConverter>();
+        var valueConverter = new MarkdownEditorValueConverter(linkParser, urlParser, markdownConverter);
 
         Assert.AreEqual(typeof(string), valueConverter.GetDeliveryApiPropertyValueType(Mock.Of<IPublishedPropertyType>()));
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), Mock.Of<IPublishedPropertyType>(), PropertyCacheLevel.Element, inter, false, false);
